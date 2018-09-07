@@ -192,13 +192,13 @@ class Robot extends Component
      */
     public function sendMsg(array $msgData=[])
     {
-        $query = \json_encode($msgData);
         try {
-            $response = $this->getHttpClient()->get($this->apiUrl."?access_token=".$this->accessToken, [
-                'query' => $msgData,
+            $response = $this->getHttpClient()->post($this->apiUrl."?access_token=".$this->accessToken, [
+                \GuzzleHttp\RequestOptions::JSON => $msgData,
                 'headers' => [
-                    'Accept'     => 'application/json'
-                ]
+                    'Content-Type'=> 'application/json;charset=utf-8'
+                ],
+
             ])->getBody()->getContents();
 
             return $response;
