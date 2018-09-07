@@ -13,7 +13,6 @@ use Yii;
 use GuzzleHttp\Client;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
-use yii\base\InvalidParamException;
 use GuzzleHttp\Exception\RequestException;
 
 class Robot extends Component
@@ -65,102 +64,149 @@ class Robot extends Component
     }
 
     /**
-     * @param array $msgData
+     * 发送文本消息
+     * @param string $content
+     * @param array $atMobiles
+     * @param bool $isAtAll
      * @return mixed
      */
-    public function sendTextMsg(array $msgData=[]){
-        if (!\is_array($msgData)) {
-            throw new InvalidParamException('msgData value type must be array');
+    public function sendTextMsg($content, array $atMobiles = [], $isAtAll = false)
+    {
+        $query = [
+            'msgtype' => 'text',
+            'text' => [
+                'content' => $content,
+            ],
+            'at' => [
+                'isAtAll' => $isAtAll
+            ],
+        ];
+        if (is_array($atMobiles) && count($atMobiles)>0) {
+            $query['at']['atMobiles'] = $atMobiles;
         }
-        if(count($msgData)==0){
-            throw new InvalidParamException('msgData value must');
-        }
-
-        return $this->sendMsg('text',$msgData);
+        return $this->sendMsg($query);
     }
 
     /**
-     * @param array $msgData
+     * 发送链接
+     * @param string $title
+     * @param string $text
+     * @param string $picUrl
+     * @param string $messageUrl
      * @return mixed
      */
-    public function sendLinkMsg(array $msgData=[]){
-        if (!\is_array($msgData)) {
-            throw new InvalidParamException('msgData value type must be array');
-        }
-        if(count($msgData)==0){
-            throw new InvalidParamException('msgData value must');
-        }
-
-        return $this->sendMsg('link',$msgData);
+    public function sendLinkMsg($title, $text, $picUrl = '', $messageUrl)
+    {
+        $query = [
+            'msgtype' => 'link',
+            'link' => [
+                'title' => $title,
+                'text' => $text,
+                'picUrl' => $picUrl,
+                'messageUrl' => $messageUrl
+            ],
+        ];
+        return $this->sendMsg($query);
     }
 
     /**
-     * @param array $msgData
+     * 发送MarkDown 消息
+     * @param string $title
+     * @param string $content
+     * @param array $atMobiles
+     * @param bool $isAtAll
      * @return mixed
      */
-    public function sendMarkdownMsg(array $msgData=[]){
-        if (!\is_array($msgData)) {
-            throw new InvalidParamException('msgData value type must be array');
+    public function sendMarkdownMsg($title, $content, array $atMobiles = [], $isAtAll = false)
+    {
+        $query = [
+            'msgtype' => 'markdown',
+            'markdown' => [
+                'title' => $title,
+                'text' => $content,
+            ],
+            'at' => [
+                'isAtAll' => $isAtAll
+            ],
+        ];
+        if (is_array($atMobiles) && count($atMobiles)>0) {
+            $query['at']['atMobiles'] = $atMobiles;
         }
-        if(count($msgData)==0){
-            throw new InvalidParamException('msgData value must');
-        }
-
-        return $this->sendMsg('markdown',$msgData);
+        return $this->sendMsg($query);
     }
 
     /**
-     * @param array $msgData
+     * 整体跳转ActionCard类型
+     * @param $title
+     * @param $content
+     * @param $singleURL
+     * @param int $hideAvatar
+     * @param int $btnOrientation
+     * @param string $singleTitle
      * @return mixed
      */
-    public function sendActionCardMsg(array $msgData=[]){
-        if (!\is_array($msgData)) {
-            throw new InvalidParamException('msgData value type must be array');
-        }
-        if(count($msgData)==0){
-            throw new InvalidParamException('msgData value must');
-        }
-
-        return $this->sendMsg('actionCard',$msgData);
+    public function sendActionCardMsg($title, $content, $singleURL, $hideAvatar = 0, $btnOrientation = 0, $singleTitle = '阅读原文')
+    {
+        $query = [
+            'msgtype' => 'actionCard',
+            'actionCard' => [
+                'title' => $title,
+                'text' => $content,
+                'hideAvatar' => $hideAvatar,
+                'btnOrientation' => $btnOrientation,
+                'singleTitle' => $singleTitle,
+                'singleURL' => $singleURL
+            ],
+        ];
+        return $this->sendMsg($query);
     }
 
     /**
-     * @param array $msgData
+     * 独立跳转ActionCard类型
+     * @param $title
+     * @param $content
+     * @param int $hideAvatar
+     * @param int $btnOrientation
+     * @param array $btns
      * @return mixed
      */
-    public function sendFeedCardMsg(array $msgData=[]){
-        if (!\is_array($msgData)) {
-            throw new InvalidParamException('msgData value type must be array');
-        }
-        if(count($msgData)==0){
-            throw new InvalidParamException('msgData value must');
-        }
-
-        return $this->sendMsg('feedCard',$msgData);
+    public function sendSingleActionCardMsg($title, $content, $hideAvatar = 0, $btnOrientation = 0, array $btns=[])
+    {
+        $query = [
+            'msgtype' => 'actionCard',
+            'actionCard' => [
+                'title' => $title,
+                'text' => $content,
+                'hideAvatar' => $hideAvatar,
+                'btnOrientation' => $btnOrientation,
+                'btns' => $btns
+            ],
+        ];
+        return $this->sendMsg($query);
     }
+
     /**
      * @param string $type
      * @param array $msgData
      * @return mixed
      */
-    public function sendMsg($type = 'text', array $msgData=[])
+    public function sendMsg(array $msgData=[])
     {
-        if (!\in_array(\strtolower($type), $this->msgTypeList)) {
-            throw new InvalidParamException('Invalid response type: '.$type);
-        }
-
-        if (!\is_array($msgData)) {
-            throw new InvalidParamException('msgData value type must be array');
-        }
-
-        $query = \json_encode($msgData);
-
         try {
             $response = $this->getHttpClient()->get($this->apiUrl."?access_token=".$this->accessToken, [
-                'query' => $query,
+                'query' => $msgData,
                 'headers' => [
                     'Accept'     => 'application/json'
-                ]
+                ],
+                'requestConfig' => [
+                    'format' => Client::FORMAT_JSON,
+                    'options' => [
+                        'timeout' => 30,
+                    ]
+                ],
+                'responseConfig' => [
+                    'format' => Client::FORMAT_JSON
+                ],
             ])->getBody()->getContents();
 
             return $response;
