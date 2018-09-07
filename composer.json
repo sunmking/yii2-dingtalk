@@ -1,0 +1,24 @@
+{
+    "name": "saviorlv/yii2-dingtalk",
+    "description": "Yii2 DingTalk robot SDk",
+    "keywords": [ "yii2", "dingtalk","robot","php","sdk"],
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://github.com/saviorlv/yii2-dingtalk",
+    "authors": [
+        {
+            "name": "saviorlv",
+            "homepage": "https://saviorlv.github.io/"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0",
+        "yiisoft/yii2": "^2.0.15",
+        "guzzlehttp/guzzle": "^6.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Saviorlv\\Dingtalk\\": "src/"
+        }
+    }
+}
