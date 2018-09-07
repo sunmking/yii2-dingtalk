@@ -186,6 +186,28 @@ class Robot extends Component
     }
 
     /**
+     * FeedCard类型
+     * @param array $links
+     * @return mixed
+     */
+    public function sendFeedCardMsg(array $links=[])
+    {
+        if(!\is_array($links)){
+            throw new InvalidValueException('this data must be array');
+        }
+        if(count($links) == count($links, 1)){
+            throw new InvalidValueException('this data must be dyadic array');
+        }
+        $query = [
+            'msgtype' => 'feedCard',
+            'feedCard' => [
+                'links'=> $links
+            ],
+        ];
+        return $this->sendMsg($query);
+    }
+    
+    /**
      * @param string $type
      * @param array $msgData
      * @return mixed
