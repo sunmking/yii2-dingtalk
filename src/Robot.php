@@ -192,21 +192,13 @@ class Robot extends Component
      */
     public function sendMsg(array $msgData=[])
     {
+        $query = \json_encode($msgData);
         try {
             $response = $this->getHttpClient()->get($this->apiUrl."?access_token=".$this->accessToken, [
                 'query' => $msgData,
                 'headers' => [
                     'Accept'     => 'application/json'
-                ],
-                'requestConfig' => [
-                    'format' => Client::FORMAT_JSON,
-                    'options' => [
-                        'timeout' => 30,
-                    ]
-                ],
-                'responseConfig' => [
-                    'format' => Client::FORMAT_JSON
-                ],
+                ]
             ])->getBody()->getContents();
 
             return $response;
