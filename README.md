@@ -1,4 +1,4 @@
-# yii2-weather 基于高德开放平台的天气信息组件。
+# yii2-dingtalk 钉钉群机器人
 
 ## 说明
 
