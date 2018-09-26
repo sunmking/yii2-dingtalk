@@ -7,7 +7,7 @@
  * @author saviorlv <1042080686@qq.com>
  */
 
-namespace Saviorlv\DingTalk;
+namespace Saviorlv\Dingtalk;
 
 use Yii;
 use GuzzleHttp\Client;
